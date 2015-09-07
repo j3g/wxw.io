@@ -1,0 +1,56 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!-- saved from url=(0021)http://xentao.com/mp/ -->
+<html style="" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+        <title>wxw.io</title>
+
+        <style type="text/css">
+         * { font-family: monospace; }
+        </style>
+
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+        <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    </head>
+    <body>
+        <script src="cryptojs/rollups/pbkdf2.js"></script>
+
+        <script>
+
+            var hash = window.location.hash.substring(1);
+
+            $(document).ready( function() {
+
+                $( '#password' ).on( "change", function(event) {
+                    var password = $('#password').val();
+                    var key = CryptoJS.PBKDF2( password, "salt", { keySize: 512/32 } );
+                    $('#key').val(key);           
+                });
+            });
+
+        </script>
+
+        <form id="xForm" action="#">
+            <section>
+                <label for="password">Password</label>
+                <input id="password" name="password" type="text">
+
+                <label for="key">Key</label>
+                <input id="key" name="key" type="text">
+
+                <label for="plaintext">Plaintext</label>
+                <input id="plaintext" name="plaintext" type="text">
+
+                <lable for="ciphertext">Ciphertext</lable>
+                <input id="ciphertext" name="ciphertext" type="text">
+
+                <input type="submit" value="Encrypt" >
+            </section>
+        </form>
+
+       </body>
+
+</html>
