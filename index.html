@@ -28,25 +28,58 @@
             $(document).ready( function() {
                 var hash = window.location.hash.substring(1);
                 if( hash )
-                    $('#ciphertext').val(hash);
+                {
+                    setCiphertext(document.URL);
+                }
 
                 $( '#buttonEncrypt' ).click( function(event)  {
                     $('#ciphertext').val('');
                     var ciphertext = encrypt( getPlaintext() );
-                    ciphertext = CryptoJS.enc.Base64.stringify(ciphertext.ciphertext);
-                    $('#ciphertext').val(ciphertext);
+
+                    setCiphertext(ciphertext);
                 });
 
                 $( '#buttonDecrypt' ).click( function(event)  {
                     $('#plaintext').val('');
                     var ciphertext = getCiphertext();
-                    ciphertext = CryptoJS.enc.Base64.parse(ciphertext);
+
                     var plaintext = decrypt( ciphertext );
                     $('#plaintext').val(plaintext);
                 });
 
 
             });
+
+
+            function
+            setCiphertext(ctext)
+            {
+                $('#ciphertext').attr('href', ctext);
+                $('#ciphertext').html(ctext);
+            }
+
+            function
+            wrapB64(anchor)
+            {
+                var regex = new RegExp( '/', 'g' )
+                return anchor.replace(regex, '_');
+            }
+
+
+            function
+            unwrapB64(anchor)
+            {
+                var regex = new RegExp( '_', 'g' )
+                return anchor.replace(regex, '/');
+            }
+
+
+            function
+            baseURL() {
+                var url = location.href.split("/");
+                url = url[0] + '//' + url[2] +'/';
+                return url;
+            }
 
             function 
             getPlaintext() {
@@ -55,7 +88,7 @@
 
             function 
             getCiphertext() {
-                return $('#ciphertext').val();
+                return $('#ciphertext').attr('href');
             }
 
             function 
@@ -65,7 +98,8 @@
 
             function 
             getKey() {
-                var key = CryptoJS.PBKDF2( getPassword(), getSalt(), { keySize: 512/32 } );
+                //var key = CryptoJS.PBKDF2( getPassword(), getSalt(), { keySize: 512/32 } );
+                var key = getPassword();
                 return key;
             }
 
@@ -81,13 +115,32 @@
 
             function 
             encrypt(plaintext) {
+                /*
                 var ciphertext = CryptoJS.AES.encrypt( plaintext, getKey(), { iv: getIV() } );
+                ciphertext = ciphertext.ciphertext;
+                ciphertext = baseURL() +'#'+ wrapB64(CryptoJS.enc.Base64.stringify(ciphertext));
+                */
+
+                var key = getKey();
+                var ciphertext = CryptoJS.AES.encrypt( plaintext, getKey() ); //, { iv: getIV() } );
+                //ciphertext = ciphertext.ciphertext;
+                ciphertext = ciphertext.toString();
+                ciphertext = wrapB64(ciphertext);
+                ciphertext = baseURL() +'#'+ ciphertext;
+
                 return ciphertext;
             }
 
             function 
             decrypt(ciphertext) {
-                var plaintext = CryptoJS.AES.decrypt( ciphertext, getKey(), { iv: getIV() } );
+                var ndex = ciphertext.indexOf('#');
+                ciphertext = ciphertext.slice(ndex+1);
+                ciphertext = unwrapB64(ciphertext);
+                //ciphertext = unwrapB64(ciphertext);
+                //ciphertext = CryptoJS.enc.Base64.parse(ciphertext);
+                //ciphertext = ciphertext.ciphertext;
+                var plaintext = CryptoJS.AES.decrypt( ciphertext, getKey() );
+                plaintext = plaintext.toString(CryptoJS.enc.Utf8);
                 return plaintext;
             }
 
@@ -98,12 +151,12 @@
                 <label for="password">Password</label>
                 <input id="password" name="password" type="text">
 
-
                 <label for="plaintext">Plaintext</label>
                 <input id="plaintext" name="plaintext" type="text">
 
-                <label for="ciphertext">Ciphertext</lable>
-                <input id="ciphertext" name="ciphertext" type="text">
+                <label for="ciphertext">Ciphertext</label>
+                <a href="foo" name="ciphertext" id="ciphertext">http:// </a> 
+                <!-- <label for="ciphertext" name="ciphertext" id="ciphertext">http://</label> -->
 
                 <button id="buttonEncrypt"  >Encrypt</button>
                 <button id="buttonDecrypt"  >Decrypt</button>
