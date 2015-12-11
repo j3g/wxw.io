@@ -17,39 +17,98 @@
     </head>
     <body>
         <script src="cryptojs/rollups/pbkdf2.js"></script>
+        <script src="cryptojs/rollups/aes.js"></script>
+        <script src="cryptojs/components/enc-base64-min.js"></script>
+        <script src="cryptojs/components/core-min.js"></script>
+        <script src="cryptojs/rollups/sha256.js"></script>
+        <script src="cryptojs/components/enc-utf16-min.js"></script>
 
         <script>
 
-            var hash = window.location.hash.substring(1);
-
             $(document).ready( function() {
+                var hash = window.location.hash.substring(1);
+                if( hash )
+                    $('#ciphertext').val(hash);
 
-                $( '#password' ).on( "change", function(event) {
-                    var password = $('#password').val();
-                    var key = CryptoJS.PBKDF2( password, "salt", { keySize: 512/32 } );
-                    $('#key').val(key);           
+                $( '#buttonEncrypt' ).click( function(event)  {
+                    $('#ciphertext').val('');
+                    var ciphertext = encrypt( getPlaintext() );
+                    ciphertext = CryptoJS.enc.Base64.stringify(ciphertext.ciphertext);
+                    $('#ciphertext').val(ciphertext);
                 });
+
+                $( '#buttonDecrypt' ).click( function(event)  {
+                    $('#plaintext').val('');
+                    var ciphertext = getCiphertext();
+                    ciphertext = CryptoJS.enc.Base64.parse(ciphertext);
+                    var plaintext = decrypt( ciphertext );
+                    $('#plaintext').val(plaintext);
+                });
+
+
             });
+
+            function 
+            getPlaintext() {
+                return $('#plaintext').val();
+            }
+
+            function 
+            getCiphertext() {
+                return $('#ciphertext').val();
+            }
+
+            function 
+            getPassword() {
+                return $('#password').val();
+            }
+
+            function 
+            getKey() {
+                var key = CryptoJS.PBKDF2( getPassword(), getSalt(), { keySize: 512/32 } );
+                return key;
+            }
+
+            function 
+            getIV() {
+                return CryptoJS.enc.Hex.parse('cd7bf0d4d1f1729b62de3d0147b13eb0');
+            }
+
+            function 
+            getSalt() {
+                return CryptoJS.enc.Hex.parse('0e6b1abcf209a36cc6796d48afcc329e');
+            }
+
+            function 
+            encrypt(plaintext) {
+                var ciphertext = CryptoJS.AES.encrypt( plaintext, getKey(), { iv: getIV() } );
+                return ciphertext;
+            }
+
+            function 
+            decrypt(ciphertext) {
+                var plaintext = CryptoJS.AES.decrypt( ciphertext, getKey(), { iv: getIV() } );
+                return plaintext;
+            }
 
         </script>
 
-        <form id="xForm" action="#">
+        <div>
             <section>
                 <label for="password">Password</label>
                 <input id="password" name="password" type="text">
 
-                <label for="key">Key</label>
-                <input id="key" name="key" type="text">
 
                 <label for="plaintext">Plaintext</label>
                 <input id="plaintext" name="plaintext" type="text">
 
-                <lable for="ciphertext">Ciphertext</lable>
+                <label for="ciphertext">Ciphertext</lable>
                 <input id="ciphertext" name="ciphertext" type="text">
 
-                <input type="submit" value="Encrypt" >
+                <button id="buttonEncrypt"  >Encrypt</button>
+                <button id="buttonDecrypt"  >Decrypt</button>
             </section>
-        </form>
+        </div>
 
        </body>
 
