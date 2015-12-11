@@ -76,8 +76,11 @@
 
             function
             baseURL() {
-                var url = location.href.split("/");
-                url = url[0] + '//' + url[2] +'/';
+                //var url = location.href.split("/");
+                var url = location.href;
+                var ndex = url.lastIndexOf('/')+1;
+                url = url.slice(0,ndex);
+                //url = url[0] + '//' + url[2] +'/';
                 return url;
             }
 
